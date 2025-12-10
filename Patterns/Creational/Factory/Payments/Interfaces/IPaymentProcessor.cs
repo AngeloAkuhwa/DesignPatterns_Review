@@ -1,4 +1,4 @@
-﻿namespace Patterns.Creational.Factory.Payments.Processors;
+﻿namespace Patterns.Creational.Factory.Payments.Interfaces;
 
 /// <summary>
 /// Explanation:
