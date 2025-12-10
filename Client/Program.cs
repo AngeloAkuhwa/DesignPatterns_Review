@@ -9,7 +9,10 @@ internal static class Program
 		// Ensure Unicode icons display correctly
 		Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-		//factory demo
+		//Factory demo
 		CreationalDemo.RunFactoryDemo();
+
+		//Abstract factory Demo
+		CreationalDemo.RunAbstractFactoryDemo();
 	}
 }
