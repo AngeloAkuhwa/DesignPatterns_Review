@@ -4,5 +4,5 @@ namespace Patterns.Creational.Factory.Payments.Processors;
 
 public class BankTransferProcessor : IPaymentProcessor
 {
-    public string Process(decimal amount) => $"Processing ₦{amount} via Direct Bank Transfer...";
+    public string Process(decimal amount) => $"Processing {amount:C} via Direct Bank Transfer...";
 }

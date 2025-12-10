@@ -5,5 +5,5 @@ namespace Patterns.Creational.Factory.Payments.Factories;
 
 public class BankTransferFactory : PaymentFactory
 {
-	protected override IPaymentProcessor CreateProcessor() => new BankTransferProcessor();
+	public override IPaymentProcessor CreateProcessor() => new BankTransferProcessor();
 }

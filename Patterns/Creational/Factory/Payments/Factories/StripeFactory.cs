@@ -5,5 +5,5 @@ namespace Patterns.Creational.Factory.Payments.Factories;
 
 public class StripeFactory : PaymentFactory
 {
-	protected override IPaymentProcessor CreateProcessor() => new StripeProcessor();
+	public override IPaymentProcessor CreateProcessor() => new StripeProcessor();
 }

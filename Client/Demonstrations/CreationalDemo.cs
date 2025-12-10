@@ -1,4 +1,6 @@
-﻿using Patterns.Creational.AbstractFactory.Notifications;
+﻿using Client.Explanations;
+using Client.Services;
+using Patterns.Creational.AbstractFactory.Notifications;
 using Patterns.Creational.AbstractFactory.Notifications.Enums;
 using Patterns.Creational.Factory.Payments.Enums;
 using Patterns.Creational.Factory.Payments.Factories;
@@ -7,41 +9,6 @@ namespace Client.Demonstrations;
 
 public static class CreationalDemo
 {
-	/*
-    ===============================================================
-    PATTERN: FACTORY METHOD
-
-		DEFINITION:
-	   Factory Method is a creational pattern that defines an interface for 
-	   creating an object while allowing subclasses to choose which concrete 
-	   class to instantiate. It moves object creation logic into separate 
-	   factory classes, keeping client code decoupled from concrete types.
-
-	   REAL-WORLD CONTEXT (IN THIS PROJECT):
-	   The payment system uses Factory Method to choose the correct payment 
-	   processor (PayStack, FlutterWave, Stripe, Bank Transfer) without 
-	   exposing concrete processor classes to the client code.
-
-    PROBLEM BEING SOLVED:
-        In a payment system, different payment providers (PayStack,
-        FlutterWave, Stripe, Bank Transfer) require different
-        processing logic. Without a Factory Method, the client code
-        would be full of switch cases or "new" statements, tightly
-        coupling the system to concrete classes.
-
-    HOW THE PATTERN SOLVES IT:
-        Factory Method defines a common creator (PaymentFactory) and
-        lets subclasses decide which concrete payment processor to
-        create. This removes conditionals from client code and
-        allows adding new payment providers without modifying existing
-        logic.
-
-    REAL-WORLD BENEFIT:
-        - Cleaner architecture
-        - Easy extension when adding new gateways
-        - Client depends only on abstractions (IPaymentProcessor)
-    ===============================================================
-*/
 	public static void RunFactoryDemo()
 	{
 		while (true)
@@ -50,8 +17,8 @@ public static class CreationalDemo
 			WriteInfo("\n=== PAYMENT FACTORY METHOD DEMO ===");
 
 			WriteInfo("Choose payment gateway:");
-			Console.WriteLine("1 - Paystack");
-			Console.WriteLine("2 - Flutterwave");
+			Console.WriteLine("1 - PayStack");
+			Console.WriteLine("2 - FlutterWave");
 			Console.WriteLine("3 - Stripe");
 			Console.WriteLine("4 - Bank Transfer");
 			Console.WriteLine("0 - Exit");
@@ -79,62 +46,84 @@ public static class CreationalDemo
 			WritePrompt("Enter amount: ");
 			if (!decimal.TryParse(Console.ReadLine(), out decimal amount) || amount <= 0)
 			{
-				WriteError("Invalid amount. Please enter a value greater than zero.\n");
+				WriteError("Invalid amount. Amount must be greater than zero.\n");
 				Pause();
 				continue;
 			}
 
 			var result = factory.ProcessPayment(amount);
+			var transactionId = Guid.NewGuid().ToString("N").Substring(0, 10);
+			var timestamp = DateTime.Now;
 
 			WriteSuccess(result);
 			WriteSuccess("Payment processed successfully!");
 
-			WriteInfo("\nPress ENTER to make another payment or type 'exit' to quit.");
-			var next = Console.ReadLine();
-			if (next?.Trim().ToLower() == "exit")
+			// POST-PAYMENT OPTIONS
+			while (true)
 			{
-				WriteSuccess("Goodbye!");
-				return;
+				WriteInfo("\nSelect an option:");
+				Console.WriteLine("1 - Print Receipt");
+				Console.WriteLine("2 - Print Detailed Breakdown");
+				Console.WriteLine("3 - Print Factory Method Pattern Explanation");
+				Console.WriteLine("4 - Process Another Payment");
+				Console.WriteLine("0 - Exit");
+
+				WritePrompt("Choice: ");
+				var option = Console.ReadLine();
+
+				switch (option)
+				{
+					// Print Receipt
+					case "1":
+						Console.Clear();
+						WriteInfo("=== PAYMENT RECEIPT ===\n");
+						WriteSuccess($"Transaction ID: {transactionId}");
+						WriteSuccess($"Provider: {provider}");
+						WriteSuccess($"Amount: {amount:C}");
+						WriteSuccess($"Timestamp: {timestamp}");
+						WriteSuccess("Status: Successful");
+						Pause();
+						break;
+
+					// Print Breakdown
+					case "2":
+						Console.Clear();
+						WriteInfo("=== PAYMENT BREAKDOWN ===\n");
+						WriteSuccess($"Factory Used: {factory.GetType().Name}");
+						WriteSuccess($"Processor Returned: {factory.CreateProcessor().GetType().Name}");
+						WriteSuccess($"Amount Sent: {amount:C}");
+						WriteSuccess($"Executed At: {timestamp}");
+						WriteInfo("\nThis shows how the Factory Method dynamically selects\n" +
+											"a concrete payment processor based on user input\n" +
+											"without the client instantiating the class directly.");
+						Pause();
+						break;
+
+					// Print Explanation
+					case "3":
+						ConsoleExplanationService.PrintExplanation(CreationalPatternExplanations.FactoryMethodExplanation);
+						break;
+
+					// Make another payment
+					case "4":
+						goto ContinueOuterLoop;
+
+					// Exit entirely
+					case "0":
+						WriteSuccess("Goodbye!");
+						return;
+
+					default:
+						WriteError("Invalid option. Try again.");
+						Pause();
+						break;
+				}
 			}
+
+			ContinueOuterLoop: continue;
 		}
 	}
 
-	/*
-    ===============================================================
-    PATTERN: ABSTRACT FACTORY
-
-		DEFINITION:
-	   Abstract Factory is a creational pattern that provides an interface 
-	   for creating entire families of related objects without specifying 
-	   their concrete implementations. It guarantees that created products 
-	   are compatible and belong to the same group or environment.
-
-	   REAL-WORLD CONTEXT (IN THIS PROJECT):
-	   The notification system uses Abstract Factory to produce consistent 
-	   sets of services—Email, SMS, Push—based on the selected environment 
-	   (Production or Sandbox), ensuring the correct family of providers is 
-	   always used together.
-
-    PROBLEM BEING SOLVED:
-        A notification system must support different environments
-        (Production and Sandbox), each with its own family of
-        services: Email, SMS, and Push providers. Without Abstract
-        Factory, we would mix concrete classes everywhere and risk
-        pairing the wrong services together.
-
-    HOW THE PATTERN SOLVES IT:
-        Abstract Factory creates entire "families" of related objects
-        without exposing concrete implementations. Each environment
-        has its own factory that guarantees consistent combinations:
-        - Prod factory → ProdEmail, ProdSms, ProdPush
-        - Sandbox factory → SandboxEmail, SandboxSms, SandboxPush
-
-    REAL-WORLD BENEFIT:
-        - Environment switching with one line
-        - No leaking of concrete classes into business logic
-        - Guarantees correct grouping of related services
-    ===============================================================
-*/
 	public static void RunAbstractFactoryDemo()
 	{
 		while (true)
@@ -142,7 +131,7 @@ public static class CreationalDemo
 			Console.Clear();
 			WriteInfo("\n=== ABSTRACT FACTORY: NOTIFICATION SYSTEM DEMO ===");
 
-			//SELECT ENVIRONMENT
+			// SELECT ENVIRONMENT
 			WriteInfo("Select environment:");
 			Console.WriteLine("1 - Production");
 			Console.WriteLine("2 - Sandbox");
@@ -172,7 +161,7 @@ public static class CreationalDemo
 			var sms = factory.CreateSmsService();
 			var push = factory.CreatePushService();
 
-			//SELECT NOTIFICATION TYPE
+			// SELECT NOTIFICATION TYPE
 			while (true)
 			{
 				Console.Clear();
@@ -189,11 +178,10 @@ public static class CreationalDemo
 				var notifyInput = Console.ReadLine();
 
 				if (notifyInput == "0")
-				{
 					break;
-				}
 
-				if (!int.TryParse(notifyInput, out int notifyValue) || notifyValue is < 1 or > 4)
+				if (!int.TryParse(notifyInput, out int notifyValue) ||
+						notifyValue is < 1 or > 4)
 				{
 					WriteError("Invalid notification type. Try again.\n");
 					Pause();
@@ -203,38 +191,105 @@ public static class CreationalDemo
 				Console.Clear();
 
 				var type = (NotificationType)notifyValue;
+				var timestamp = DateTime.Now;
+				var transactionId = Guid.NewGuid().ToString("N")[..10];
+
 				// SEND SELECTED NOTIFICATIONS
+
+				string? lastMessage = null;
+
 				switch (type)
 				{
 					case NotificationType.Email:
-						WriteSuccess(email.SendEmail("test@example.com", "Hello from Abstract Factory!"));
+						lastMessage = email.SendEmail("test@example.com", "Hello from Abstract Factory!");
+						WriteSuccess(lastMessage);
 						break;
 
 					case NotificationType.Sms:
-						WriteSuccess(sms.SendSms("+2348012345678", "Your OTP is 1234"));
+						lastMessage = sms.SendSms("+2348012345678", "Your OTP is 1234");
+						WriteSuccess(lastMessage);
 						break;
 
 					case NotificationType.PushNotification:
-						WriteSuccess(push.SendPush("device-010101", "New message received"));
+						lastMessage = push.SendPush("device-010101", "New message received");
+						WriteSuccess(lastMessage);
 						break;
 
 					case NotificationType.All:
 						WriteSuccess(email.SendEmail("test@example.com", "Hello from Abstract Factory!"));
 						WriteSuccess(sms.SendSms("+2348012345678", "Your OTP is 1234"));
-						WriteSuccess(push.SendPush("device-010101", "New message received"));
+						lastMessage = push.SendPush("device-010101", "New message received");
+						WriteSuccess(lastMessage);
 						break;
 				}
 
 				WriteInfo("\nNotifications sent successfully!");
 
-				WriteInfo("\nPress ENTER to select another notification or type 'exit' to quit.");
-				var cont = Console.ReadLine();
-
-				if (cont?.Trim().ToLower() == "exit")
+				// POST-NOTIFICATION MENU
+				while (true)
 				{
-					WriteSuccess("Goodbye!");
-					return;
+					WriteInfo("\nSelect an option:");
+					Console.WriteLine("1 - Print Notification Receipt");
+					Console.WriteLine("2 - Print Detailed Breakdown");
+					Console.WriteLine("3 - Print Abstract Factory Explanation");
+					Console.WriteLine("4 - Send Another Notification");
+					Console.WriteLine("0 - Exit");
+
+					WritePrompt("Choice: ");
+					var option = Console.ReadLine();
+
+					switch (option)
+					{
+						// Receipt
+						case "1":
+							Console.Clear();
+							WriteInfo("=== NOTIFICATION RECEIPT ===\n");
+							WriteSuccess($"Environment: {environment}");
+							WriteSuccess($"Notification Type: {type}");
+							WriteSuccess($"Message: {lastMessage}");
+							WriteSuccess($"Timestamp: {timestamp}");
+							WriteSuccess($"Reference ID: {transactionId}");
+							Pause();
+							break;
+
+						// Detailed Breakdown
+						case "2":
+							Console.Clear();
+							WriteInfo("=== NOTIFICATION BREAKDOWN ===\n");
+							WriteSuccess($"Factory Used: {factory.GetType().Name}");
+							WriteSuccess($"Email Service: {email.GetType().Name}");
+							WriteSuccess($"SMS Service: {sms.GetType().Name}");
+							WriteSuccess($"Push Service: {push.GetType().Name}");
+							WriteSuccess($"Last Notification Sent: {type}");
+							WriteSuccess($"Sent At: {timestamp}");
+							WriteInfo("\nThis demonstrates the Abstract Factory pattern,");
+							WriteInfo("which guarantees families of related objects remain compatible.");
+							Pause();
+							break;
+
+						// Pattern Explanation
+						case "3":
+							ConsoleExplanationService.PrintExplanation(
+									CreationalPatternExplanations.AbstractFactoryExplanation);
+							break;
+
+						// Send another notification
+						case "4":
+							goto SelectAnotherNotification;
+
+						// Exit all
+						case "0":
+							WriteSuccess("Goodbye!");
+							return;
+
+						default:
+							WriteError("Invalid option. Try again.");
+							Pause();
+							break;
+					}
 				}
+
+				SelectAnotherNotification: continue;
 			}
 		}
 	}

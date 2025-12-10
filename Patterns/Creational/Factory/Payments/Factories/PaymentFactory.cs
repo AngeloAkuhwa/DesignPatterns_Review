@@ -11,7 +11,7 @@ namespace Patterns.Creational.Factory.Payments.Factories;
 public abstract class PaymentFactory
 {
     // Factory Method
-    protected abstract IPaymentProcessor CreateProcessor();
+    public abstract IPaymentProcessor CreateProcessor();
 
     // High-level logic that uses the factory method
     public string ProcessPayment(decimal amount)
