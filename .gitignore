@@ -1,0 +1,14 @@
+obj
+bin
+packages
+*.user
+Final.config
+*.suo
+sidekickapp.exe
+stacktrace.txt
+.vs/
+.idea/
+*.iml
+*.VisualState.xml
+**/tempServer
+**/Tests/**/running_instances
