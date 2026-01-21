@@ -16,7 +16,7 @@ public abstract class PaymentFactory
     // High-level logic that uses the factory method
     public string ProcessPayment(decimal amount)
     {
-        var processor = CreateProcessor(); // call factory method
+        var processor = CreateProcessor();
         return processor.Process(amount);
     }
 }

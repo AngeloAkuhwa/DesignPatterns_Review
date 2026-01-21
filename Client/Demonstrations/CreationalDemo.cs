@@ -2,6 +2,8 @@
 using Client.Services;
 using Patterns.Creational.AbstractFactory.Notifications;
 using Patterns.Creational.AbstractFactory.Notifications.Enums;
+using Patterns.Creational.Builder.Builders;
+using Patterns.Creational.Builder.Director;
 using Patterns.Creational.Factory.Payments.Enums;
 using Patterns.Creational.Factory.Payments.Factories;
 
@@ -292,6 +294,35 @@ public static class CreationalDemo
 				SelectAnotherNotification: continue;
 			}
 		}
+	}
+
+
+	public static void RunBuilderDemo()
+	{
+		var builder = new ComputerBuilder();
+		var director = new ComputerDirector(builder);
+
+		var officePc = director.BuildOfficePc();
+		var gamingPc = director.BuildGamingPc();
+
+		Console.WriteLine("Office PC:");
+		Console.WriteLine(officePc);
+
+		Console.WriteLine();
+		Console.WriteLine("Gaming PC:");
+		Console.WriteLine(gamingPc);
+
+		Console.WriteLine();
+		Console.WriteLine("Custom build (no director):");
+		var custom = builder.Reset()
+				.SetCpu("Intel i9")
+				.SetRam(64)
+				.SetStorage(2000)
+				.SetGpu("RTX 4090")
+				.EnableWifi()
+				.Build();
+
+		Console.WriteLine(custom);
 	}
 
 	private static void WriteError(string message)
