@@ -6,6 +6,8 @@ using Patterns.Creational.Builder.Builders;
 using Patterns.Creational.Builder.Director;
 using Patterns.Creational.Factory.Payments.Enums;
 using Patterns.Creational.Factory.Payments.Factories;
+using Patterns.Creational.Prototype.Models;
+using Patterns.Creational.Prototype.Registry;
 
 namespace Client.Demonstrations;
 
@@ -296,7 +298,6 @@ public static class CreationalDemo
 		}
 	}
 
-
 	public static void RunBuilderDemo()
 	{
 		var builder = new ComputerBuilder();
@@ -325,6 +326,53 @@ public static class CreationalDemo
 		Console.WriteLine(custom);
 	}
 
+	public static void RunPrototypeDemo()
+	{
+		// Create a baseline template ONCE => this is the "prototype".
+		var welcomeTemplate = new EmailTemplate
+		{
+			Name = "WelcomeEmail",
+			Subject = "Welcome to Schedula",
+			Body = "Hi {{Name}},\n\nWelcome to Schedula! We’re glad to have you.\n\nCheers,\nTeam",
+			Branding = new EmailBranding
+			{
+				CompanyName = "Schedula Inc",
+				Footer = "© 2026 Schedula. All rights reserved."
+			},
+			Tags = new List<string> { "transactional", "welcome" }
+		};
+
+		// Register it
+		var registry = new PrototypeRegistry();
+		registry.Register("WelcomeEmail", welcomeTemplate);
+
+		// Clone it for different users => copy  and  tweak
+		var emailForAngelo = registry.CreateClone("WelcomeEmail");
+		emailForAngelo.Subject = "Welcome, Angelo";
+		emailForAngelo.Body = emailForAngelo.Body.Replace("{{Name}}", "Angelo");
+
+		var emailForSeyi = registry.CreateClone("WelcomeEmail");
+		emailForSeyi.Subject = "Welcome, Seyi";
+		emailForSeyi.Body = emailForSeyi.Body.Replace("{{Name}}", "Seyi");
+
+		// Print results
+		WriteInfo("=== Email for Angelo ===");
+		WriteInfo(emailForAngelo);
+
+		WriteInfo("\n=== Email for Seyi ===");
+		WriteInfo(emailForSeyi);
+
+		// Proves deep copy works (changing one clone doesn't affect the other)
+		emailForAngelo.Branding.Footer = "Angelo footer test";
+		emailForAngelo.Tags.Add("vip");
+
+		WriteInfo("\n=== Deep copy proof ===");
+		WriteInfo("Angelo footer: " + emailForAngelo.Branding.Footer);
+		WriteInfo("Seyi footer: " + emailForSeyi.Branding.Footer);
+		WriteInfo("Angelo tags: " + string.Join(", ", emailForAngelo.Tags));
+		WriteInfo("Seyi tags: " + string.Join(", ", emailForSeyi.Tags));
+	}
+
 	private static void WriteError(string message)
 	{
 		Console.ForegroundColor = ConsoleColor.Red;
@@ -340,6 +388,13 @@ public static class CreationalDemo
 	}
 
 	private static void WriteInfo(string message)
+	{
+		Console.ForegroundColor = ConsoleColor.Cyan;
+		Console.WriteLine(message);
+		Console.ResetColor();
+	}
+
+	private static void WriteInfo(object message)
 	{
 		Console.ForegroundColor = ConsoleColor.Cyan;
 		Console.WriteLine(message);
