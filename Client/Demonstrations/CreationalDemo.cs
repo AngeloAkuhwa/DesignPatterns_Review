@@ -8,11 +8,26 @@ using Patterns.Creational.Factory.Payments.Enums;
 using Patterns.Creational.Factory.Payments.Factories;
 using Patterns.Creational.Prototype.Models;
 using Patterns.Creational.Prototype.Registry;
+using Patterns.Creational.Singleton;
 
 namespace Client.Demonstrations;
 
 public static class CreationalDemo
 {
+	public static void RunSingletonDemo()
+	{
+		// Same instance everywhere
+		var config1 = AppConfigSingleton.Instance;
+		config1.Initialize("Production", "https://api.my-saas.com");
+
+		var config2 = AppConfigSingleton.Instance;
+
+		Console.WriteLine($"Config1 Env: {config1.EnvironmentName}, BaseUrl: {config1.BaseUrl}");
+		Console.WriteLine($"Config2 Env: {config2.EnvironmentName}, BaseUrl: {config2.BaseUrl}");
+
+		Console.WriteLine("Same instance? " + ReferenceEquals(config1, config2));
+	}
+
 	public static void RunFactoryDemo()
 	{
 		while (true)
