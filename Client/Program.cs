@@ -15,6 +15,8 @@ internal static class Program
 		////Abstract factory Demo
 		//CreationalDemo.RunAbstractFactoryDemo();
 
-		CreationalDemo.RunBuilderDemo();
+		//CreationalDemo.RunBuilderDemo();
+
+		CreationalDemo.RunSingletonDemo();
 	}
 }
